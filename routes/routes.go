@@ -13,6 +13,8 @@ func StartRoutes(c *controller.StudentController) {
 		r.GET("/students", c.ReturnAllStudents)
 		r.POST("/students", c.CreateStudent)
 		r.GET("/students/:id", c.ReturnSingleStudent)
+		r.PUT("/students/:id", c.UpdateStudent)
+		r.DELETE("/students/:id", c.DeleteStudent)
 		r.Run(":8080")
 	}
 }

@@ -56,14 +56,14 @@ func (r *StudentController) CreateStudent(c *gin.Context) {
 		})
 		return
 	}
-	age, ok := reqBody["age"].(int)
+	age, ok := reqBody["age"].(float64)
 	if !ok {
 		c.JSON(400, gin.H{
 			"message": "Invalid request body",
 		})
 		return
 	}
-	student := r.StudentRepository.CreateStudent(name, age)
+	student := r.StudentRepository.CreateStudent(name, int(age))
 	json.NewEncoder(c.Writer).Encode(&student)
 }
 
@@ -94,7 +94,7 @@ func (r *StudentController) UpdateStudent(c *gin.Context) {
 		})
 		return
 	}
-	age, ok := reqBody["age"].(int)
+	age, ok := reqBody["age"].(float64)
 	if !ok {
 		c.JSON(400, gin.H{
 			"message": "Invalid request body",
@@ -103,7 +103,7 @@ func (r *StudentController) UpdateStudent(c *gin.Context) {
 	}
 	id := c.Param("id")
 	idConverted, _ := strconv.Atoi(id)
-	r.StudentRepository.UpdateStudent(idConverted, name, age)
+	r.StudentRepository.UpdateStudent(idConverted, name, int(age))
 	c.JSON(200, gin.H{
 		"message": "Student updated",
 	})
