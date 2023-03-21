@@ -1,7 +1,7 @@
 package main
 
-import r "github.com/guerraglucas/ginApi/routes"
+import s "github.com/guerraglucas/ginApi/setup"
 
 func main() {
-	r.StartRoutes()
+	s.Setup()
 }

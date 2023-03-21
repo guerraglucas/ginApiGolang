@@ -5,12 +5,14 @@ import (
 	controller "github.com/guerraglucas/ginApi/controllers"
 )
 
-func StartRoutes() {
+func StartRoutes(c *controller.StudentController) {
 	{
 		r := gin.Default()
 		r.GET("/", controller.Index)
-		r.GET("/students", controller.ReturnAllStudents)
-		r.GET("/students/:id", controller.ReturnSingleStudent)
+		r.GET("/:name", controller.ReturnGreetings)
+		r.GET("/students", c.ReturnAllStudents)
+		r.POST("/students", c.CreateStudent)
+		r.GET("/students/:id", c.ReturnSingleStudent)
 		r.Run(":8080")
 	}
 }
