@@ -1,9 +1,9 @@
 package models
 
 type StudentRepository interface {
-	CreateStudent(name string, age int) (Student, error)
+	CreateStudent(Student) (Student, error)
 	DeleteStudent(id int) (Student, error)
-	UpdateStudent(id int, name string, age int) (Student, error)
+	UpdateStudent(Student) (Student, error)
 	GetStudent(id int) (Student, error)
 	GetAllStudents() ([]Student, error)
 }

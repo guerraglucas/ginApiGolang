@@ -15,9 +15,8 @@ func NewStudentRepository(db *sql.DB) *StudentRepositoryImp {
 	return &StudentRepositoryImp{db}
 }
 
-func (r *StudentRepositoryImp) CreateStudent(name string, age int) (m.Student, error) {
-	student := m.Student{Name: name, Age: age}
-	err := r.db.QueryRow("INSERT INTO students (name, age) VALUES ($1, $2) RETURNING id", name, age).Scan(&student.Id)
+func (r *StudentRepositoryImp) CreateStudent(student m.Student) (m.Student, error) {
+	err := r.db.QueryRow("INSERT INTO students (name, age) VALUES ($1, $2) RETURNING id", student.Name, student.Age).Scan(&student.Id)
 	if err != nil {
 		return student, err
 	}
@@ -33,9 +32,9 @@ func (r *StudentRepositoryImp) DeleteStudent(id int) (m.Student, error) {
 	return student, nil
 }
 
-func (r *StudentRepositoryImp) UpdateStudent(id int, name string, age int) (m.Student, error) {
-	student := m.Student{}
-	err := r.db.QueryRow("UPDATE students SET name = $1, age = $2 WHERE id = $3 RETURNING id, name, age", name, age, id).Scan(&student.Id, &student.Name, &student.Age)
+func (r *StudentRepositoryImp) UpdateStudent(student m.Student) (m.Student, error) {
+
+	err := r.db.QueryRow("UPDATE students SET name = $1, age = $2 WHERE id = $3 RETURNING id, name, age", student.Name, student.Age, student.Id).Scan(&student.Id, &student.Name, &student.Age)
 	if err != nil {
 		return student, err
 	}

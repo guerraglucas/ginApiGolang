@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -24,11 +25,11 @@ func NewStudentController(studentRepository models.StudentRepository) *StudentCo
 func (r *StudentController) ReturnAllStudents(c *gin.Context) {
 	students, err := r.StudentRepository.GetAllStudents()
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting students",
 		})
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"students": students,
 	})
 }
@@ -39,43 +40,29 @@ func (r *StudentController) ReturnSingleStudent(c *gin.Context) {
 	idConverted, _ := strconv.Atoi(id)
 	student, err := r.StudentRepository.GetStudent(idConverted)
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting student",
 		})
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"student": student,
 	})
 }
 
 // CreateStudent creates a new student from the postgres db
 func (r *StudentController) CreateStudent(c *gin.Context) {
-	var reqBody map[string]interface{}
+	var newStudent models.Student
+	err := c.ShouldBind(&newStudent)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request body",
+		})
+		return
+	}
 
-	err := json.NewDecoder(c.Request.Body).Decode(&reqBody)
+	student, err := r.StudentRepository.CreateStudent(newStudent)
 	if err != nil {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	name, ok := reqBody["name"].(string)
-	if !ok {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	age, ok := reqBody["age"].(float64)
-	if !ok {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	student, err := r.StudentRepository.CreateStudent(name, int(age))
-	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error creating student",
 		})
 	}
@@ -87,49 +74,34 @@ func (r *StudentController) DeleteStudent(c *gin.Context) {
 	idConverted, _ := strconv.Atoi(id)
 	_, err := r.StudentRepository.DeleteStudent(idConverted)
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error deleting student",
 		})
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Student deleted",
 	})
 
 }
 
 func (r *StudentController) UpdateStudent(c *gin.Context) {
-	var reqBody map[string]interface{}
-
-	errJson := json.NewDecoder(c.Request.Body).Decode(&reqBody)
-	if errJson != nil {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	name, ok := reqBody["name"].(string)
-	if !ok {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	age, ok := reqBody["age"].(float64)
-	if !ok {
-		c.JSON(400, gin.H{
-			"message": "Invalid request body",
-		})
-		return
-	}
-	id := c.Param("id")
-	idConverted, _ := strconv.Atoi(id)
-	_, err := r.StudentRepository.UpdateStudent(idConverted, name, int(age))
+	var studentToUpdate models.Student
+	err := c.ShouldBind(&studentToUpdate)
 	if err != nil {
-		c.JSON(500, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "Invalid request body",
+		})
+		return
+	}
+
+	_, errRepo := r.StudentRepository.UpdateStudent(studentToUpdate)
+	if errRepo != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error updating student",
 		})
+		return
 	}
-	c.JSON(200, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"message": "Student updated",
 	})
 }
