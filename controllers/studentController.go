@@ -28,6 +28,7 @@ func (r *StudentController) ReturnAllStudents(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting students",
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"students": students,
@@ -43,6 +44,7 @@ func (r *StudentController) ReturnSingleStudent(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error getting student",
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"student": student,
@@ -65,6 +67,7 @@ func (r *StudentController) CreateStudent(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error creating student",
 		})
+		return
 	}
 	json.NewEncoder(c.Writer).Encode(&student)
 }
@@ -77,6 +80,7 @@ func (r *StudentController) DeleteStudent(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "Error deleting student",
 		})
+		return
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"message": "Student deleted",
