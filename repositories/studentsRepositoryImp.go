@@ -1,48 +1,71 @@
 package repositories
 
 import (
+	"database/sql"
+
 	m "github.com/guerraglucas/ginApi/models"
-	"gorm.io/gorm"
 )
 
 type StudentRepositoryImp struct {
-	db *gorm.DB
+	db *sql.DB
 }
 
 // Constructor for StudentRepositoryImp
-func NewStudentRepository(db *gorm.DB) *StudentRepositoryImp {
+func NewStudentRepository(db *sql.DB) *StudentRepositoryImp {
 	return &StudentRepositoryImp{db}
 }
 
-func (r *StudentRepositoryImp) CreateStudent(name string, age int) m.Student {
-
+func (r *StudentRepositoryImp) CreateStudent(name string, age int) (m.Student, error) {
 	student := m.Student{Name: name, Age: age}
-	r.db.Create(&student)
-	return student
+	err := r.db.QueryRow("INSERT INTO students (name, age) VALUES ($1, $2) RETURNING id", name, age).Scan(&student.Id)
+	if err != nil {
+		return student, err
+	}
+	return student, nil
 }
 
-func (r *StudentRepositoryImp) DeleteStudent(id int) m.Student {
+func (r *StudentRepositoryImp) DeleteStudent(id int) (m.Student, error) {
 	student := m.Student{}
-	r.db.Delete(&student, id)
-	return student
+	err := r.db.QueryRow("DELETE FROM students WHERE id = $1 RETURNING id, name, age", id).Scan(&student.Id, &student.Name, &student.Age)
+	if err != nil {
+		return student, err
+	}
+	return student, nil
 }
 
-func (r *StudentRepositoryImp) UpdateStudent(id int, name string, age int) m.Student {
+func (r *StudentRepositoryImp) UpdateStudent(id int, name string, age int) (m.Student, error) {
 	student := m.Student{}
-	r.db.Model(&student).Where("id = ?", id).Updates(m.Student{Name: name, Age: age})
-	return student
+	err := r.db.QueryRow("UPDATE students SET name = $1, age = $2 WHERE id = $3 RETURNING id, name, age", name, age, id).Scan(&student.Id, &student.Name, &student.Age)
+	if err != nil {
+		return student, err
+	}
+	return student, nil
 }
 
-func (r *StudentRepositoryImp) GetStudent(id int) m.Student {
+func (r *StudentRepositoryImp) GetStudent(id int) (m.Student, error) {
 	student := m.Student{}
-	r.db.First(&student, id)
-	return student
+	err := r.db.QueryRow("SELECT * FROM students WHERE id = $1", id).Scan(&student.Id, &student.Name, &student.Age)
+	if err != nil {
+		return student, err
+	}
+	return student, nil
 }
 
-func (r *StudentRepositoryImp) GetAllStudents() []m.Student {
-	students := []m.Student{}
-	r.db.Find(&students)
-	return students
+func (r *StudentRepositoryImp) GetAllStudents() ([]m.Student, error) {
+	var students []m.Student
+	rows, err := r.db.Query("SELECT * FROM students")
+	if err != nil {
+		return students, err
+	}
+	for rows.Next() {
+		student := m.Student{}
+		err = rows.Scan(&student.Id, &student.Name, &student.Age)
+		if err != nil {
+			return students, err
+		}
+		students = append(students, student)
+	}
+	return students, nil
 }
 
 // this verifies that StudentRepositoryImp implements StudentRepository

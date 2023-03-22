@@ -1,37 +1,53 @@
 package databases
 
 import (
-	m "github.com/guerraglucas/ginApi/models"
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"database/sql"
+	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 const (
-	pgHost     = "localhost"
-	pgPort     = "5432"
-	pgUser     = "root"
-	pgPassword = "root"
-	pgDatabase = "root"
+	pgHost                                               = "localhost"
+	pgPort                                               = 5432
+	pgUser                                               = "root"
+	pgPassword                                           = "root"
+	pgDatabase                                           = "root"
+	studentsTable, studentsNameColumn, studentsAgeColumn = "students", "name", "age"
 )
 
 var (
-	DB  *gorm.DB
+	DB  *sql.DB
 	err error
 )
 
 func ConnectToPostgres() {
-	dsn := "host=" + pgHost + " port=" + pgPort + " user=" + pgUser + " password=" + pgPassword + " dbname=" + pgDatabase + " sslmode=disable"
-	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	dsn := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", pgUser, pgPassword, pgHost, pgPort, pgDatabase)
+	DB, err = sql.Open("postgres", dsn)
 	if err != nil {
 		panic(err)
 	}
-	DB.AutoMigrate(&m.Student{})
+	createTableIfNotExists()
 }
 
 func CloseConnection() {
-	sqlDB, err := DB.DB()
+	sqlDB := DB
 	if err != nil {
 		panic(err)
 	}
 	sqlDB.Close()
+}
+
+func createTableIfNotExists() {
+	sqlStatement := fmt.Sprintf(`
+	CREATE TABLE IF NOT EXISTS %s (
+		id SERIAL,
+		%s TEXT,
+		%s INT
+	);`, studentsTable, studentsNameColumn, studentsAgeColumn)
+
+	_, err = DB.Exec(sqlStatement)
+	if err != nil {
+		panic(err)
+	}
 }

@@ -22,7 +22,12 @@ func NewStudentController(studentRepository models.StudentRepository) *StudentCo
 
 // ReturnAllStudents returns all students from the StudentRepository
 func (r *StudentController) ReturnAllStudents(c *gin.Context) {
-	students := r.StudentRepository.GetAllStudents()
+	students, err := r.StudentRepository.GetAllStudents()
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Error getting students",
+		})
+	}
 	c.JSON(200, gin.H{
 		"students": students,
 	})
@@ -32,7 +37,12 @@ func (r *StudentController) ReturnAllStudents(c *gin.Context) {
 func (r *StudentController) ReturnSingleStudent(c *gin.Context) {
 	id := c.Param("id")
 	idConverted, _ := strconv.Atoi(id)
-	student := r.StudentRepository.GetStudent(idConverted)
+	student, err := r.StudentRepository.GetStudent(idConverted)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Error getting student",
+		})
+	}
 	c.JSON(200, gin.H{
 		"student": student,
 	})
@@ -63,14 +73,24 @@ func (r *StudentController) CreateStudent(c *gin.Context) {
 		})
 		return
 	}
-	student := r.StudentRepository.CreateStudent(name, int(age))
+	student, err := r.StudentRepository.CreateStudent(name, int(age))
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Error creating student",
+		})
+	}
 	json.NewEncoder(c.Writer).Encode(&student)
 }
 
 func (r *StudentController) DeleteStudent(c *gin.Context) {
 	id := c.Param("id")
 	idConverted, _ := strconv.Atoi(id)
-	r.StudentRepository.DeleteStudent(idConverted)
+	_, err := r.StudentRepository.DeleteStudent(idConverted)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Error deleting student",
+		})
+	}
 	c.JSON(200, gin.H{
 		"message": "Student deleted",
 	})
@@ -80,8 +100,8 @@ func (r *StudentController) DeleteStudent(c *gin.Context) {
 func (r *StudentController) UpdateStudent(c *gin.Context) {
 	var reqBody map[string]interface{}
 
-	err := json.NewDecoder(c.Request.Body).Decode(&reqBody)
-	if err != nil {
+	errJson := json.NewDecoder(c.Request.Body).Decode(&reqBody)
+	if errJson != nil {
 		c.JSON(400, gin.H{
 			"message": "Invalid request body",
 		})
@@ -103,7 +123,12 @@ func (r *StudentController) UpdateStudent(c *gin.Context) {
 	}
 	id := c.Param("id")
 	idConverted, _ := strconv.Atoi(id)
-	r.StudentRepository.UpdateStudent(idConverted, name, int(age))
+	_, err := r.StudentRepository.UpdateStudent(idConverted, name, int(age))
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Error updating student",
+		})
+	}
 	c.JSON(200, gin.H{
 		"message": "Student updated",
 	})

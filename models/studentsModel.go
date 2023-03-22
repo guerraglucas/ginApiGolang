@@ -1,11 +1,7 @@
 package models
 
-import (
-	"gorm.io/gorm"
-)
-
 type Student struct {
-	gorm.Model
-	Name string `json:"name"`
-	Age  int    `json:"age"`
+	Id   int    `json:"id" db:"id"`
+	Name string `json:"name" db:"name"`
+	Age  int    `json:"age" db:"age"`
 }
