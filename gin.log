@@ -5,6 +5,7 @@
 [GIN-debug] GET    /students/:id             --> github.com/guerraglucas/ginApi/controllers.(*StudentController).ReturnSingleStudent-fm (1 handlers)
 [GIN-debug] PATCH  /students/:id             --> github.com/guerraglucas/ginApi/controllers.(*StudentController).UpdateStudent-fm (1 handlers)
 [GIN-debug] DELETE /students/:id             --> github.com/guerraglucas/ginApi/controllers.(*StudentController).DeleteStudent-fm (1 handlers)
+[GIN-debug] GET    /students/search          --> github.com/guerraglucas/ginApi/controllers.(*StudentController).SearchStudent-fm (1 handlers)
 [GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
 Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
 [GIN-debug] Listening and serving HTTP on :8080

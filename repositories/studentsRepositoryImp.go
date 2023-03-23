@@ -66,5 +66,14 @@ func (r *StudentRepositoryImp) GetAllStudents() ([]m.Student, error) {
 	return students, nil
 }
 
+func (r *StudentRepositoryImp) SearchStudent(name string) (m.Student, error) {
+	student := m.Student{}
+	err := r.db.QueryRow("SELECT * FROM students WHERE name = $1", name).Scan(&student.Id, &student.Name, &student.Age)
+	if err != nil {
+		return student, err
+	}
+	return student, nil
+}
+
 // this verifies that StudentRepositoryImp implements StudentRepository
 var _ m.StudentRepository = &StudentRepositoryImp{}

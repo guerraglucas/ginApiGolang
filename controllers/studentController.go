@@ -101,3 +101,15 @@ func (r *StudentController) UpdateStudent(c *gin.Context) {
 		"message": "Student updated",
 	})
 }
+
+func (r *StudentController) SearchStudent(c *gin.Context) {
+	name := c.Query("name")
+	students, err := r.StudentRepository.SearchStudent(name)
+	if err != nil {
+		utils.HttpErrorHandler(err, c)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"students": students,
+	})
+}

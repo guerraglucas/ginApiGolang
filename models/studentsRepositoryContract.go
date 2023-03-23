@@ -6,4 +6,5 @@ type StudentRepository interface {
 	UpdateStudent(Student) (Student, error)
 	GetStudent(id int) (Student, error)
 	GetAllStudents() ([]Student, error)
+	SearchStudent(string) (Student, error)
 }

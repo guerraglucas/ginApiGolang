@@ -21,6 +21,7 @@ func StartRoutes(c *controller.StudentController) {
 		r.GET("/students/:id", c.ReturnSingleStudent)
 		r.PATCH("/students/:id", c.UpdateStudent)
 		r.DELETE("/students/:id", c.DeleteStudent)
+		r.GET("/students/search", c.SearchStudent)
 		r.Run(":8080")
 	}
 }
