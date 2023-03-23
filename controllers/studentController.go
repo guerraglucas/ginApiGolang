@@ -83,6 +83,10 @@ func (r *StudentController) DeleteStudent(c *gin.Context) {
 func (r *StudentController) UpdateStudent(c *gin.Context) {
 	var studentToUpdate models.Student
 	err := c.ShouldBind(&studentToUpdate)
+
+	id, _ := strconv.Atoi(c.Param("id"))
+	studentToUpdate.Id = id
+
 	if err != nil {
 		utils.HttpErrorHandler(err, c)
 		return

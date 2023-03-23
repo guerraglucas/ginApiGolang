@@ -33,7 +33,6 @@ func (r *StudentRepositoryImp) DeleteStudent(id int) (m.Student, error) {
 }
 
 func (r *StudentRepositoryImp) UpdateStudent(student m.Student) (m.Student, error) {
-
 	err := r.db.QueryRow("UPDATE students SET name = $1, age = $2 WHERE id = $3 RETURNING id, name, age", student.Name, student.Age, student.Id).Scan(&student.Id, &student.Name, &student.Age)
 	if err != nil {
 		return student, err

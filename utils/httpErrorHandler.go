@@ -16,5 +16,4 @@ func HttpErrorHandler(err error, c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		c.Abort()
 	}
-
 }
